@@ -1,30 +1,19 @@
 package org.curiouslearning.updaterapp;
 
-import android.app.ActivityManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.util.List;
 
 /**
- * Created by David on 7/10/2015 for Curious Learning.
+ * Created by David Gibbs on 7/10/2015 for Curious Learning.
  * curiouslearning.org
  */
 public class AppUtility
 {
     private String TAG = Config.TAG;
-    private String apkName = null;
-    private String packageName = null;
+    private String oldApkName;
+    private String backupFilePath;
 
-    private AppUtility(){}
-
-    public AppUtility(String apkName, String packageName)
-    {
-        this.apkName = apkName;
-        this.packageName = packageName;
-    }
-
-    public boolean isAppInstalled()
+    public boolean isAppInstalled(String packageName)
     {
         Utilities utilities = new Utilities();
         String command = "pm list packages";
@@ -34,23 +23,57 @@ public class AppUtility
         return (response.toLowerCase().contains(packageName));
     }
 
-    public boolean uninstallApp()
+
+    public boolean uninstallApp(String packageName)
     {
 
         int numberOfApplications = countInstalledPackages();
 
-        String installCommand = "pm uninstall " + packageName;
+        String uninstallCommand = "pm uninstall " + packageName;
 
         ExecuteCommandAsRoot executeCommandAsRoot = new ExecuteCommandAsRoot();
-        executeCommandAsRoot.addCommand(installCommand);
+        executeCommandAsRoot.addCommand(uninstallCommand);
         executeCommandAsRoot.execute();
 
         int numberOfNewlyInstalledApps = countInstalledPackages() - numberOfApplications;
 
         if(numberOfNewlyInstalledApps == -1)
+        {
             Log.i(TAG, packageName + " Uninstalled correctly");
-
+            return true;
+        }
         return false;
+    }
+
+
+    public boolean backupApp(String currentFileLocation, String apkName)
+    {
+        oldApkName = apkName;
+        if(!FileUtility.fileExists(currentFileLocation))
+            return false;
+
+        String backupPath = Config.BACKUP_FILE_LOCATION + apkName + ".backup";
+        this.backupFilePath = backupPath;
+
+        FileUtility.myCopyFile(currentFileLocation, backupPath);
+
+        return FileUtility.fileExists(backupPath);
+    }
+
+    public boolean rollbackAppInstall()
+    {
+        String backupFilePath = Config.BACKUP_FILE_LOCATION + oldApkName;
+        FileUtility.myCopyFile(backupFilePath + ".backup",
+                backupFilePath);
+
+        installApp(backupFilePath);
+
+        return isAppInstalled(backupFilePath);
+    }
+
+    public void killApp(int processId)
+    {
+        android.os.Process.killProcess(processId);
     }
 
 
@@ -112,7 +135,6 @@ public class AppUtility
         }
         return (numberOfNewlyInstalledApps == 1);
     }
-
 
 
     /**

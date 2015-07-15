@@ -1,9 +1,11 @@
 package org.curiouslearning.updaterapp;
 
+import android.util.Log;
+
 import java.io.File;
 
 /**
- * Created by David on 7/10/2015 for Curious Learning.
+ * Created by David Gibbs on 7/10/2015 for Curious Learning.
  * curiouslearning.org
  */
 public class FileUtility {
@@ -21,6 +23,18 @@ public class FileUtility {
         return new File(filePath).isFile();
     }
 
+
+    public static void myCopyFile(String fileToCopy, String target) {
+        CopyFileAsRoot copyFile = new CopyFileAsRoot();
+        copyFile.fileToCopy = fileToCopy;
+        copyFile.target = target;
+        if(copyFile.execute()) {
+            Log.i(TAG, "executed myCopyFile commands ok");
+        } else {
+            Log.i(TAG, "did not execute myCopyFile commands ok");
+
+        }
+    }
 
 
 }

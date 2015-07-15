@@ -1,18 +1,13 @@
 package org.curiouslearning.updaterapp;
 
-/**
- * Created by David on 7/10/2015 for Curious Learning.
- * curiouslearning.org
- */
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+
 /**
- * Created by Curious Learning on 5/4/2015.
- *
- * Accepts a command and adds to a list of commands for later execution
+ * Created by David Gibbs on 7/10/2015 for Curious Learning.
+ * curiouslearning.org
  */
 public class ExecuteCommandAsRoot extends ExecuteAsRootBase {
 

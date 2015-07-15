@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * Created by David on 7/10/2015 for Curious Learning.
+ * Created by David Gibbs on 7/10/2015 for Curious Learning.
  * curiouslearning.org
  */
 public class Utilities
@@ -19,7 +19,8 @@ public class Utilities
      * @param command the command to be executed
      * @return the result of the executed command
      */
-    public String executeCommand(String command) {
+    public String executeCommand(String command)
+    {
         String output = "";
 
         try {
