@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.*;
 import android.util.Log;
 
 import java.util.List;
@@ -35,36 +36,73 @@ public class UpdateReceiver extends BroadcastReceiver
     synchronized
     private void primaryProcessor(Context context, Intent intent)
     {
+        Log.i(TAG, "Starting to update app");
         String packageNameString = "packageName";
         String processIdString = "processId";
         String oldApkNameString = "oldApkName";
         String oldApkPathString = "oldApkPath";
         String newApkPathString = "newApkPath";
+        String rebootString = "reboot";
 
         String oldApkName, newApkPath, oldApkPath, packageName;
         oldApkName = newApkPath = oldApkPath = packageName = null;
+        boolean reboot = false;
 
         int processIdOfAppToUpdate = -1;
 
         if(intent.hasExtra(oldApkNameString))
+        {
             oldApkName = intent.getStringExtra(oldApkNameString);
+            Log.i(TAG, "Old APK name: " + oldApkName);
+        }
+        else
+            Log.i(TAG, "Old APK name not present");
 
         if(intent.hasExtra(packageNameString))
+        {
             packageName = intent.getStringExtra(packageNameString);
+            Log.i(TAG, "Package name: " + packageName);
+        }
+        else
+            Log.i(TAG, "Package name not present");
 
         if(intent.hasExtra(oldApkPathString))
+        {
             oldApkPath = intent.getStringExtra(oldApkPathString);
+            Log.i(TAG, "Old APK to be uninstalled: " + oldApkPath);
+        }
+        else
+            Log.i(TAG, "Old APK to be uninstalled not present");
+
 
         if(intent.hasExtra(newApkPathString))
+        {
             newApkPath = intent.getStringExtra(newApkPathString);
+            Log.i(TAG, "APK to be installed: " + newApkPath);
+        }
+        else
+            Log.i(TAG, "APK to be installed not present");
+
+        if(intent.hasExtra(newApkPathString))
+        {
+            reboot = intent.getBooleanExtra(rebootString, false);
+            Log.i(TAG, "Reboot after successful install: " + reboot);
+        }
+            Log.i(TAG, "Reboot command is missing");
 
         if(intent.hasExtra(processIdString)) {
             try
             {
                 processIdOfAppToUpdate = Integer.parseInt(intent.getStringExtra("processId"));
+                Log.i(TAG, "Process ID of app to update: " + processIdOfAppToUpdate);
             }
-            catch (NullPointerException e) {}
+            catch (NullPointerException e)
+            {
+                Log.e(TAG, "Process ID isn't a number: " + intent.getStringExtra("processId"));
+            }
         }
+        else
+            Log.i(TAG, "Process ID of app to be removed not present");
 
         AppUtility appUtility = new AppUtility();
 
@@ -112,8 +150,28 @@ public class UpdateReceiver extends BroadcastReceiver
         launchApp(packageName, context);
 
         //Verify that the app is running
-        if(isAppRunning(context, packageName))
-            Log.i(TAG, "App successfully installed and is running");
+        if(!isAppRunning(context, packageName))
+            return;
+        Log.i(TAG, "App successfully installed and is running");
+
+        String backupApkPath = Config.BACKUP_FILE_LOCATION + oldApkName + ".backup";
+
+        //Delete the apk to save space
+        FileUtility.myDeleteFile(newApkPath);
+        FileUtility.myDeleteFile(backupApkPath);
+
+        if(reboot)
+        {
+            //Sleep to let other app initialize after install
+            try
+            {
+                Thread.sleep(5000);
+            }
+            catch(InterruptedException e) {}
+            ExecuteCommandAsRoot executeCommandAsRoot = new ExecuteCommandAsRoot();
+            executeCommandAsRoot.addCommand("reboot");
+            executeCommandAsRoot.execute();
+        }
     }
 
 

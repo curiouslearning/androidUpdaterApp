@@ -36,5 +36,16 @@ public class FileUtility {
         }
     }
 
+    public static void myDeleteFile(String fileToDelete) {
+        DeleteFileAsRoot deleteFile = new DeleteFileAsRoot();
+        deleteFile.fileToDelete = fileToDelete;
+        if(deleteFile.execute()) {
+            Log.i(TAG, "executed deletefileasroot commands ok");
+        } else {
+            Log.i(TAG, "did not execute deletefileasroot commands ok");
+
+        }
+    }
+
 
 }

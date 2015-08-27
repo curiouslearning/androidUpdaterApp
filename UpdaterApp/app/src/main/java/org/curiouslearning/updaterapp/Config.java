@@ -7,7 +7,7 @@ import android.os.Environment;
  * curiouslearning.org
  */
 public class Config {
-    public final static String TAG = "org.curiouslearning.updaterapp";
+    public final static String TAG = "updaterapp";
     public final static String BACKUP_FILE_LOCATION =
             Environment.getExternalStorageDirectory().getPath() + "/";
 }
