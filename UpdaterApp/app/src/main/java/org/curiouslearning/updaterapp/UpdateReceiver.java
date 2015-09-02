@@ -116,7 +116,7 @@ public class UpdateReceiver extends BroadcastReceiver
         //Move current APK to backup location
         if(!appUtility.backupApp(oldApkPath, oldApkName))
         {
-            Log.e(TAG, "Unable to find apk to backup");
+            Log.e(TAG, "Unable to find apk to backup: oldpath - " + oldApkPath);
             return;
         }
 

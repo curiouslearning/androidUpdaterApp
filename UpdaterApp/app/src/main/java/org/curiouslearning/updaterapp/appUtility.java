@@ -91,7 +91,7 @@ public class AppUtility
         //Count the number of installed applications
         int numberOfApplications = countInstalledPackages();
 
-        String installCommand = "pm install " + apkLocation;
+        String installCommand = "pm install -r " + apkLocation;
 
         ExecuteCommandAsRoot executeCommandAsRoot = new ExecuteCommandAsRoot();
         executeCommandAsRoot.addCommand(installCommand);
